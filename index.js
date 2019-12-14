@@ -1,5 +1,6 @@
 const fs = require("fs");
 const express = require("express");
+const uuidv1 = require("uuid/v1");
 
 const PORT = process.env.PORT || 8000;
 const app = express();
@@ -23,18 +24,16 @@ app.get("/api/notes", function(req, res) {
 
 app.post("/api/notes", function(req, res) {
   const newNote = req.body;
-  console.log(typeof req.body);
-  //step 2 parse as JSON
-  //push new data to the file
-  //write to file and console the message
+  newNote.id = uuidv1();
+
   fs.readFile("./db/db.json", "utf8", (err, data) => {
     if (err) throw err;
     const notesFile = JSON.parse(data);
 
     notesFile.push(newNote);
     const json = JSON.stringify(notesFile);
-    console.log(notesFile);
-    fs.writeFile("./db/db.json", json, "utf8", (err, data) => {
+
+    fs.writeFile("./db/db.json", json, "utf8", err => {
       if (err) throw err;
       res.send("Note has been written");
     });
