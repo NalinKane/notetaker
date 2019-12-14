@@ -1,23 +1,27 @@
 const fs = require("fs");
 const express = require("express");
 
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
 const app = express();
-var path = require("path");
+const path = require("path");
+const publicFolder = "public";
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
-app.use(express.static("public"));
+app.use(express.static(publicFolder));
 
 app.get("/notes", function(req, res) {
-  res.sendFile(path.join(__dirname, "public/notes.html"));
-  console.log(res);
-  console.log(path);
+  res.sendFile(path.join(__dirname, `${publicFolder}/notes.html`));
+});
+app.get("/api/notes", function(req, res) {
+  fs.readFile("./db/db.json", (err, data) => {
+    if (err) throw err;
+    return res.json(JSON.parse(data));
+  });
 });
 
 app.get("*", function(req, res) {
-  res.sendFile(path.join(__dirname, "public/index.html"));
+  res.sendFile(path.join(__dirname, `${publicFolder}/index.html`));
 });
 
 app.listen(PORT, function() {
